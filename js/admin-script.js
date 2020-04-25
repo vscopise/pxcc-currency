@@ -23,7 +23,7 @@ jQuery(document).ready(function($){
                                 id: id
                             },
                             success: function(response){
-                                if (response==0) {
+                                if (response == 0) {
                                     current.remove();
                                 } else {
                                     alert( currency_in_use_msg );
