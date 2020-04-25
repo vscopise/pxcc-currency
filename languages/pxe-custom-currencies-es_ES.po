@@ -1,0 +1,69 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2017-04-06 09:17-0300\n"
+"PO-Revision-Date: 2017-04-06 09:18-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: includes/pxcc-admin-settings-table.php:18 pxe-custom-currencies.php:163
+msgid "Name"
+msgstr "Nombre"
+
+#: includes/pxcc-admin-settings-table.php:19 pxe-custom-currencies.php:164
+msgid "Code"
+msgstr "Código"
+
+#: includes/pxcc-admin-settings-table.php:20 pxe-custom-currencies.php:165
+msgid "Sign"
+msgstr "Símbolo"
+
+#: includes/pxcc-admin-settings-table.php:21 pxe-custom-currencies.php:166
+msgid "Rate"
+msgstr "Cotización"
+
+#: includes/pxcc-admin-settings-table.php:59
+msgid "Insert Currency"
+msgstr "Agregar Moneda"
+
+#: includes/pxcc-admin-settings-table.php:60
+msgid "Remove selected Currency"
+msgstr "Quitar la Moneda seleccionada"
+
+#: pxe-custom-currencies.php:71
+msgid "The value was obtained based on the current rate"
+msgstr "El valor se obtuvo en base a la cotización actual"
+
+#: pxe-custom-currencies.php:143
+msgid "Currency"
+msgstr "Moneda"
+
+#: pxe-custom-currencies.php:167
+msgid "No currency(es) selected"
+msgstr "No seleccionó la moneda"
+
+#: pxe-custom-currencies.php:168
+msgid "This Currency is used"
+msgstr "Esta Moneda está siendo usada"
+
+#: pxe-custom-currencies.php:177
+msgid "Additional Currencies"
+msgstr "Monedas Adicionales"
+
+#: pxe-custom-currencies.php:183
+#, php-format
+msgid "Get your API key <a href=\"%s\" target=\"_blank\">Here</a>"
+msgstr "Obtenga su Clave API <a href=\"%s\" target=\"_blank\">Aquí</a>"
+
+#: pxe-custom-currencies.php:212
+msgid "PXE Custom Currencies requires WooCommerce."
+msgstr ""
