@@ -37,7 +37,12 @@ class PXE_Custom_Currencies {
         public function __construct() {
                 add_filter( 'woocommerce_general_settings', __CLASS__ . '::settings', 999 );
                 add_action( 'woocommerce_admin_field_pxcc_dynamic_currencies_table', __CLASS__ . '::admin_settings_table' );
-                add_action( 'woocommerce_update_option_pxcc_dynamic_currencies_table', __CLASS__ . '::pxcc_update_currencies_data' );
+                
+                //add_action( 'woocommerce_update_option', __CLASS__ . '::update_currencies_data' );
+                //add_action( 'woocommerce_update_option_pxcc_dynamic_currencies_table', __CLASS__ . '::update_currencies_data' );
+                //add_filter( 'woocommerce_admin_settings_sanitize_option_dynamic_currencies_table', __CLASS__ . '::sanitize_productcategory_option', 10, 3 );
+                add_action( 'woocommerce_settings_saved', __CLASS__ . '::update_currencies_data' );
+
                 add_action( 'admin_notices', __CLASS__ . '::admin_notices' );
                 
                 add_action( 'admin_enqueue_scripts', __CLASS__ . '::admin_scripts' );
@@ -393,8 +398,12 @@ class PXE_Custom_Currencies {
         public static function admin_settings_table() {
                 require_once dirname( __FILE__ ) . '/includes/admin-settings-table.php';
         }
-                
-        public function pxcc_update_currencies_data() {
+        public static function sanitize_productcategory_option( $value, $option, $raw_value ) {
+                $value = array_filter( array_map( 'wc_clean', (array) $raw_value ) );
+                return $value;
+        }       
+
+        public static function update_currencies_data() {
                 $pxcc_currencies_new = (array) $_POST['pxcc_currencies'];
                 $pxcc_currencies_data = array();
                 foreach( $pxcc_currencies_new as $fields => $settings ){

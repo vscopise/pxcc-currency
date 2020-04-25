@@ -35,7 +35,7 @@ $pxcc_currencies = get_option( 'pxcc_currencies_data', array() );
                                 <input type="text" disabled="disabled" value="1" />
                         </td>
                 </tr>
-            <?php if ( count($pxcc_currencies) > 1 ) : foreach( $pxcc_currencies as $data ) : ?>
+            <?php if ( count($pxcc_currencies) > 0 ) : foreach( $pxcc_currencies as $data ) : ?>
                 <tr>
                         <td>
                                 <input type="hidden" value="<?php echo esc_attr( $data['id'] ) ?>" name="pxcc_currencies[id][]" />

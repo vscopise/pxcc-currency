@@ -1,4 +1,4 @@
-jQuery(document).ready(function($){
+jQuery(document).ready(function ($) {
         /* global pxcc_admin_object */
         var name_label = pxcc_admin_object.name_label;
         var code_label = pxcc_admin_object.code_label;
@@ -10,45 +10,51 @@ jQuery(document).ready(function($){
         var loading = '<span class="spinner is-active" style="float: left;"></span>';
         $('.remove_item').on('click', function handler() {
                 var tbody = $('.currencies_settings').find('tbody');
-                if ( tbody.find('tr.current').size() > 0 ) {
+                if (tbody.find('tr.current').size() > 0) {
                         $('.remove_item').off('click');
                         $('.remove_item').after(loading);
                         current = tbody.find('tr.current');
                         id = current.find('input[name="pxcc_currencies[id][]"]').val();
                         $.ajax({
-                            type: 'post',
-                            url: ajax_url,
-                            data:{
-                                action: 'pxcc_remove_currency',
-                                id: id
-                            },
-                            success: function(response){
-                                if (response == 0) {
-                                    current.remove();
-                                } else {
-                                    alert( currency_in_use_msg );
+                                type: 'post',
+                                url: ajax_url,
+                                data: {
+                                        action: 'pxcc_remove_currency',
+                                        id: id
+                                },
+                                success: function (response) {
+                                        if (response == 0) {
+                                                current.remove();
+                                        } else {
+                                                alert(currency_in_use_msg);
+                                        }
+                                        $('.remove_item').nextAll().remove();
+                                },
+                                complete: function () {
+                                        $('.remove_item').click(handler);
                                 }
-                                $('.remove_item').nextAll().remove();
-                            },
-                            complete: function() {
-                                   $('.remove_item').click(handler);
-                            }
                         });
 
                 } else {
-                        alert( no_currency_msg );
+                        alert(no_currency_msg);
                         //$( "#dialog" ).dialog();
                 }
                 return false;
         });
-        $('.currencies_settings .insert').click(function() {
+        $('.currencies_settings .insert').click(function () {
                 var tbody = $('.currencies_settings').find('tbody');
                 var id_currency = tbody.find('tr').size();
 
-                var last_row = tbody.find('tr.new').size();
+                var empty = true;
+                tbody.find('tr.new').last().children().find('input[type="text"]').each(function () {
+                        if ($(this).val() != '') {
+                                empty = false;
+                                return false;
+                        }
+                });
                 var row = '<tr class="new">\\n\
                                 <td width="40%">\
-                                        <input type="hidden" value="'+id_currency+'" name="pxcc_currencies[id][]" />\
+                                        <input type="hidden" value="'+ id_currency + '" name="pxcc_currencies[id][]" />\
                                         <input type="text" name="pxcc_currencies[name][]" placeholder="' + name_label + '" />\
                                 </td>\
                                 <td width="10%">\
@@ -62,17 +68,16 @@ jQuery(document).ready(function($){
                                 </td>\
                         </tr>';
                 var num_tr_new = tbody.find('tr.new').size();
-                var last_tr_input = tbody.find('tr.new').last().find('input[type="text"]');
 
-                if ( num_tr_new === 0 || tbody.find('tr.new').last()) {
-                        tbody.append( row );
+                if (num_tr_new === 0 || !empty) {
+                        tbody.append(row);
                 } else {
                         alert('error')
                 }
-               /*if ( tbody.find('tr.current').size() > 0 ) {
-                        tbody.find('tr.current').after( row );
-                } else {
-                        tbody.append( row );
-                }*/
+                /*if ( tbody.find('tr.current').size() > 0 ) {
+                         tbody.find('tr.current').after( row );
+                 } else {
+                         tbody.append( row );
+                 }*/
         });
 });
