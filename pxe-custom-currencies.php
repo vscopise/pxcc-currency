@@ -30,7 +30,7 @@ class PXE_Custom_Currencies {
                 return self::$instance; 
         }
         
-        public function plugin_setup() {
+        public static function plugin_setup() {
                 add_action( 'pxe_cc_cron_hook', __CLASS__ . '::pxcc_get_remote_currencies' );
         }
         
@@ -38,9 +38,6 @@ class PXE_Custom_Currencies {
                 add_filter( 'woocommerce_general_settings', __CLASS__ . '::settings', 999 );
                 add_action( 'woocommerce_admin_field_pxcc_dynamic_currencies_table', __CLASS__ . '::admin_settings_table' );
                 
-                //add_action( 'woocommerce_update_option', __CLASS__ . '::update_currencies_data' );
-                //add_action( 'woocommerce_update_option_pxcc_dynamic_currencies_table', __CLASS__ . '::update_currencies_data' );
-                //add_filter( 'woocommerce_admin_settings_sanitize_option_dynamic_currencies_table', __CLASS__ . '::sanitize_productcategory_option', 10, 3 );
                 add_action( 'woocommerce_settings_saved', __CLASS__ . '::update_currencies_data' );
 
                 add_action( 'admin_notices', __CLASS__ . '::admin_notices' );
@@ -69,17 +66,17 @@ class PXE_Custom_Currencies {
                 add_action( 'woocommerce_checkout_create_order_line_item', __CLASS__ . '::checkout_create_order_line_item', 10, 4 );
                 add_action( 'woocommerce_checkout_create_order', __CLASS__ . '::checkout_create_order', 10, 2 );
                 
-                add_action( 'wp_enqueue_scripts', __CLASS__ . '::pxcc_enqueue_scripts' );
+                add_action( 'wp_enqueue_scripts', __CLASS__ . '::enqueue_scripts' );
 
-		        add_filter( 'woocommerce_cart_totals_order_total_html', __CLASS__ . '::cart_totals_order_total_html' );
-		        add_filter( 'woocommerce_cart_subtotal', __CLASS__ . '::cart_subtotal', 10, 3 );
+                add_filter( 'woocommerce_cart_totals_order_total_html', __CLASS__ . '::cart_totals_order_total_html' );
+                add_filter( 'woocommerce_cart_subtotal', __CLASS__ . '::cart_subtotal', 10, 3 );
         }
         
-        function cart_needs_shipping() {
+        public static function cart_needs_shipping() {
             return true;
         }
         
-        function free_shipping_is_available( $is_available, $package, $shipping ) {
+        public static function free_shipping_is_available( $is_available, $package, $shipping ) {
             global $woocommerce;
             
             $cart_content = $woocommerce->cart->cart_contents;
@@ -108,9 +105,9 @@ class PXE_Custom_Currencies {
             return $cart_price > 3000 ? true: false;
         }
         
-        function get_price_html( $price, $product ) {
+        public static function get_price_html( $price, $product ) {
             
-            $product_id = $product->id;
+            $product_id = $product->get_id();
             $pxcc_currency = get_post_meta( $product_id, '_pxcc_currency', true );
             if ( $pxcc_currency != '' && $pxcc_currency != '0' ) {
                 $pxcc_currencies_data = get_option('pxcc_currencies_data');
@@ -122,7 +119,7 @@ class PXE_Custom_Currencies {
             return $price;
         }
         
-        function checkout_create_order_line_item( $item, $cart_item_key, $values, $order ) {
+        public static function checkout_create_order_line_item( $item, $cart_item_key, $values, $order ) {
             $product_id = $values['product_id'];
             $pxcc_currency = get_post_meta( $product_id, '_pxcc_currency', true );
             if ( $pxcc_currency != '' && $pxcc_currency != '0' ) {
@@ -134,7 +131,7 @@ class PXE_Custom_Currencies {
             }
         }
         
-        function checkout_create_order( $order, $data ) {
+        public static function checkout_create_order( $order, $data ) {
             $new_total = 0;
             foreach( $order->get_items() as $item_id => $item ) {
                 $new_total += $item -> get_total();
@@ -148,28 +145,32 @@ class PXE_Custom_Currencies {
         
         
         
-        function cart_subtotal( $cart_subtotal, $compound, $cart_content ) {
-            global $woocommerce;
+        public static function cart_subtotal( $cart_subtotal, $compound, $cart_content ) {
+            //global $woocommerce;
 
+            $pxcc_currencies_data = get_option('pxcc_currencies_data');
             $subtotal = 0;
 
-		    $pxcc_currencies_data = get_option('pxcc_currencies_data');
-            $element = array_search( $pxcc_currency, array_column( $pxcc_currencies_data, 'id' ) );
-            $currency_rate = $pxcc_currencies_data[$element]['rate'];
+            //$element = array_search( $pxcc_currency, array_column( $pxcc_currencies_data, 'id' ) );
+            //$currency_rate = $pxcc_currencies_data[$element]['rate'];
             
-            $cart_content = $woocommerce->cart->cart_contents;
+           // $cart_content = $woocommerce->cart->cart_contents;
+
+                if (0 === count($cart_content->cart_contents)) return false;
             
             foreach ( $cart_content as $cart_item ) {
-			    $pxcc_currency = get_post_meta( $cart_item['product_id'], '_pxcc_currency', true );
-			    if ( $pxcc_currency != '' && $pxcc_currency != '0' ) {
-				    if ( $cart_item['data']->is_on_sale() ) {
-                        $item_price = $cart_item['data'] -> get_sale_price();
-                    } else {
-                        $item_price = $cart_item['data'] -> get_regular_price();
-                    }
-				    $item_price = $item_price * $currency_rate;
+                $pxcc_currency = get_post_meta( $cart_item['product_id'], '_pxcc_currency', true );
+                if ( $pxcc_currency != '' && $pxcc_currency != '0' ) {
+                        $element = array_search( $pxcc_currency, array_column( $pxcc_currencies_data, 'id' ) );
+                        $currency_rate = $pxcc_currencies_data[$element]['rate'];
+                        if ( $cart_item['data']->is_on_sale() ) {
+                              $item_price = $cart_item['data'] -> get_sale_price();
+                        } else {
+                                $item_price = $cart_item['data'] -> get_regular_price();
+                        }
+                        $item_price = $item_price * $currency_rate;
                 } else {
-                    $item_price = (float) $cart_item['data']->price;
+                        $item_price = (float) $cart_item['data']->price;
                 }
                 $cart_item_quantity = (int) $cart_item['quantity'];
                 
@@ -185,20 +186,23 @@ class PXE_Custom_Currencies {
             return $cart_subtotal;
         }
         
-	    function cart_totals_order_total_html( $total ) {
-		    global $woocommerce;
+        public static function cart_totals_order_total_html( $total ) {
+                global $woocommerce;
 
-            $total = 0;
+                $total = 0;
 
-		    $pxcc_currencies_data = get_option('pxcc_currencies_data');
-            $element = array_search( $pxcc_currency, array_column( $pxcc_currencies_data, 'id' ) );
-            $currency_rate = $pxcc_currencies_data[$element]['rate'];
-
-            $cart_content = $woocommerce->cart->cart_contents;
-            foreach ( $cart_content as $cart_item ) {
-			    $pxcc_currency = get_post_meta( $cart_item['product_id'], '_pxcc_currency', true );
-			    if ( $pxcc_currency != '' && $pxcc_currency != '0' ) {
-				    if ( $cart_item['data']->is_on_sale() ) {
+                $pxcc_currencies_data = get_option('pxcc_currencies_data');
+                
+                $cart_content = $woocommerce->cart->cart_contents;
+                
+                if (0 === count($cart_content->cart_contents)) return false;
+                
+                foreach ( $cart_content as $cart_item ) {
+                        $pxcc_currency = get_post_meta( $cart_item['product_id'], '_pxcc_currency', true );
+                        $element = array_search( $pxcc_currency, array_column( $pxcc_currencies_data, 'id' ) );
+                        $currency_rate = $pxcc_currencies_data[$element]['rate'];
+                        if ( $pxcc_currency != '' && $pxcc_currency != '0' ) {
+                                if ( $cart_item['data']->is_on_sale() ) {
                         $item_price = $cart_item['data'] -> get_sale_price();
                     } else {
                         $item_price = $cart_item['data'] -> get_regular_price();
@@ -223,13 +227,13 @@ class PXE_Custom_Currencies {
             return $total;
 	    }
 
-        function pxcc_enqueue_scripts() {
+        public static function enqueue_scripts() {
                 wp_enqueue_style( 'dashicons' );
         }
         
-        function pxcc_format_sale_price( $price, $regular_price, $sale_price ) {
+        public static function pxcc_format_sale_price( $price, $regular_price, $sale_price ) {
                 global $product;
-                $pxcc_currency = get_post_meta( $product->id, '_pxcc_currency', true );
+                $pxcc_currency = get_post_meta( $product->get_id(), '_pxcc_currency', true );
                 if ( $pxcc_currency != '' && $pxcc_currency != '0' ) {
                         $currency_symbol = pxcc_currency_symbol( $product->id );
                         $wc_price = '<span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">' . $currency_symbol.'</span>' . $regular_price . '</span>';
@@ -239,7 +243,7 @@ class PXE_Custom_Currencies {
                 return $price;
         }
         
-        function pxcc_product_get_price( $price, $product ) {
+        public static function pxcc_product_get_price( $price, $product ) {
                 $pxcc_currency = get_post_meta( $product->id, '_pxcc_currency', true );
                 if ( $pxcc_currency != '' && $pxcc_currency != '0' ) {
                         $pxcc_currencies_data = get_option('pxcc_currencies_data');
@@ -250,7 +254,7 @@ class PXE_Custom_Currencies {
                 return $price;
         }
         
-        function pxcc_cart_item_subtotal( $wc, $item ) {
+       public static function pxcc_cart_item_subtotal( $wc, $item ) {
                 global $woocommerce;
 		        $currency_symbol = get_woocommerce_currency_symbol();
 

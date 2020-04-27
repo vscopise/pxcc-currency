@@ -11,7 +11,8 @@ $wc_currency_name = $wc_currencies[$wc_currency];
 $wc_currency_code = $wc_currency;
 $wc_currency_symbol = get_woocommerce_currency_symbol() ;
 
-$pxcc_currencies = get_option( 'pxcc_currencies_data', array() );
+//$pxcc_currencies = get_option( 'pxcc_currencies_data', array() );
+$pxcc_currencies = get_option( 'pxcc_currencies_data' );
 ?>
 <table class="currencies_settings wc_input_table sortable widefat">
         <thead>
@@ -35,8 +36,8 @@ $pxcc_currencies = get_option( 'pxcc_currencies_data', array() );
                                 <input type="text" disabled="disabled" value="1" />
                         </td>
                 </tr>
-            <?php if ( count($pxcc_currencies) > 0 ) : foreach( $pxcc_currencies as $data ) : ?>
-                <tr>
+            <?php if ( $pxcc_currencies ) : foreach( $pxcc_currencies as $data ) : ?>
+                <tr>0
                         <td>
                                 <input type="hidden" value="<?php echo esc_attr( $data['id'] ) ?>" name="pxcc_currencies[id][]" />
                                 <input type="text" value="<?php echo esc_attr( $data['name'] ) ?>" name="pxcc_currencies[name][]" />
